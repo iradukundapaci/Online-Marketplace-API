@@ -1,10 +1,11 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthDto } from './dto';
+import { PrismaService } from '../prisma/prisma.service';
+import { SigninDto, signupDto } from './dto';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { MailerService } from 'src/mailer/mailer.service';
 
 @Injectable()
 class AuthService {
@@ -12,21 +13,31 @@ class AuthService {
     private prisma: PrismaService,
     private jwt: JwtService,
     private config: ConfigService,
+    private mailer: MailerService,
   ) {}
 
-  async signup(user: AuthDto) {
+  async signup(user: signupDto) {
     if (user == null) {
       return 'no user found';
     }
     try {
       user.password = await argon.hash(user.password);
+
       const data = await this.prisma.user.create({
         data: {
           ...user,
         },
       });
-      delete data.password;
-      return data;
+
+      const token = this.generateToken(data.userId, data.email, '30m');
+      const verificationUrl = `http://localhost:3000/auth/verify?token=${token}`;
+
+      await this.mailer.sendMail(
+        data.email,
+        'Verify your email',
+        `Please verify your email by clicking here: ${verificationUrl}`,
+      );
+      return { message: 'Verification email sent' };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
@@ -36,7 +47,7 @@ class AuthService {
       throw error;
     }
   }
-  async signin(user: AuthDto) {
+  async signin(user: SigninDto) {
     if (user == null) {
       return 'no user found';
     }
@@ -50,28 +61,50 @@ class AuthService {
         throw new ForbiddenException('Incorrect credentials');
       }
 
-      const valid = await argon.verify(data.password, user.password);
+      const valid: boolean = await argon.verify(data.password, user.password);
+
       if (!valid) {
         throw new ForbiddenException('Incorrect credentials');
       }
-      delete data.password;
-      return data;
+
+      if (data.isVerified === false) {
+        throw new ForbiddenException('Please verify your email');
+      }
+
+      return this.generateToken(data.userId, data.email);
     } catch (error) {
       throw error;
     }
   }
 
-  async generateToken(userId: number, email: string) {
+  async verifyEmail(token: string) {
+    try {
+      const data = await this.jwt.verify(token, {
+        secret: this.config.get('JWT_SECRET'),
+      });
+      const user = await this.prisma.user.update({
+        where: {
+          email: data.email,
+        },
+        data: {
+          isVerified: true,
+        },
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  generateToken(userId: number, email: string, expiresIn: string = '15m') {
     const payload = {
       sub: userId,
       email,
     };
-    return {
-      access_token: await this.jwt.signAsync(payload, {
-        expiresIn: '15m',
-        secret: this.config.get('JWT_SECRET'),
-      }),
-    };
+    return this.jwt.sign(payload, {
+      expiresIn: expiresIn,
+      secret: this.config.get('JWT_SECRET'),
+    });
   }
 }
 
