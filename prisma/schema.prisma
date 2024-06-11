@@ -12,3 +12,102 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  ADMIN
+  SELLER
+  BUYER
+}
+
+enum Status {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+  COMPLETED
+  FAILED
+  PAID
+}
+
+model User {
+  userId  Int  @id @default(autoincrement())
+  names   String
+  email   String @unique
+  password String
+  role   Role
+  profilePicture String?
+  Address String?
+  telephone String?
+  isBlocked Boolean @default(false)
+  isVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationships
+  orders   Order[]
+  products Product[]
+  reviews  Review[]
+
+}
+
+model Product {
+  productId  Int  @id @default(autoincrement())
+  userId     Int
+  categoryId Int
+  name       String
+  description String
+  price      Float
+  stock   Int
+  tag    String
+  isFeatured Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationships
+  owner User @relation(fields: [userId], references: [userId])
+  category Category @relation(fields: [categoryId], references: [categoryId])
+  reviews Review[]
+  orders  Order[]
+}
+
+model Order {
+  orderId  Int  @id @default(autoincrement())
+  userId   Int
+  productId Int
+  quantity  Int
+  totalPrice Float
+  status    Status
+  orderDate DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationships
+  owner User @relation(fields: [userId], references: [userId])
+  product Product @relation(fields: [productId], references: [productId])
+
+}
+
+model Review {
+  reviewId  Int  @id @default(autoincrement())
+  userId    Int
+  productId Int
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationships
+  owner User @relation(fields: [userId], references: [userId])
+  product Product @relation(fields: [productId], references: [productId])
+}
+
+model Category {
+  categoryId  Int  @id @default(autoincrement())
+  name        String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relationships
+  products Product[]
+}
