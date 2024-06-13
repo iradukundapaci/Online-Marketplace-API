@@ -96,10 +96,16 @@ class AuthService {
     }
   }
 
-  generateToken(userId: number, email: string, expiresIn: string = '15m') {
+  generateToken(
+    userId: number,
+    email: string,
+    role: string = 'BUYER',
+    expiresIn: string = '15m',
+  ) {
     const payload = {
       sub: userId,
       email,
+      role,
     };
     return this.jwt.sign(payload, {
       expiresIn: expiresIn,
