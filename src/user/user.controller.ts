@@ -21,23 +21,23 @@ export class UserController {
 
   // Admin: Create a new user
   @UseGuards(JwtGuard, RolesGuard)
-  @Admin()
+  //@Admin()
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   // Admin: Get all users
-  @UseGuards(JwtGuard, RolesGuard)
-  @Admin()
-  @Get()
+  @UseGuards(JwtGuard)
+  //@Admin()
+  @Get('all')
   findAll() {
     return this.userService.findAll();
   }
 
   // Admin: Get a user by ID
   @UseGuards(JwtGuard, RolesGuard)
-  @Admin()
+  //@Admin()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findOne(id);
@@ -45,7 +45,7 @@ export class UserController {
 
   // Admin: Update a user by ID
   @UseGuards(JwtGuard, RolesGuard)
-  @Admin()
+  //@Admin()
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -56,7 +56,7 @@ export class UserController {
 
   // Admin: Delete a user by ID
   @UseGuards(JwtGuard, RolesGuard)
-  @Admin()
+  //@Admin()
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);
