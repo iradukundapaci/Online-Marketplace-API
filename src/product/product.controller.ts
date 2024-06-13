@@ -1,45 +1,56 @@
+// src/product/product.controller.ts
 import {
-  Body,
   Controller,
   Get,
-  Param,
-  ParseIntPipe,
   Post,
-  Delete,
+  Body,
   Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { ProductService } from './product.service';
+
+import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { CreateProductDto, UpdateProductDto } from './dto';
+//import { Admin, Roles } from 'src/auth/decorator';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productsService: ProductService) {}
+  constructor(private readonly productService: ProductService) {}
 
   @Post()
-  create(@Body() createProductDto: Prisma.ProductCreateInput) {
-    return this.productsService.create(createProductDto);
+  @UseGuards(JwtGuard, RolesGuard)
+  //  @Roles('SELLER')
+  create(@Body() createProductDto: CreateProductDto) {
+    return this.productService.create(createProductDto);
   }
 
   @Get()
   findAll() {
-    return this.productsService.findAll();
+    return this.productService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.findOne(id);
+  findOne(@Param('id', ParseIntPipe) productId: number) {
+    return this.productService.findOne(productId);
   }
 
   @Patch(':id')
+  @UseGuards(JwtGuard, RolesGuard)
+  //  @Roles('SELLER')
   update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateProductDto: Prisma.ProductUpdateInput,
+    @Param('id', ParseIntPipe) productId: number,
+    @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsService.update(id, updateProductDto);
+    return this.productService.update(productId, updateProductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.productsService.remove(id);
+  @UseGuards(JwtGuard, RolesGuard)
+  //  @Roles('SELLER')
+  remove(@Param('id', ParseIntPipe) productId: number) {
+    return this.productService.remove(productId);
   }
 }
