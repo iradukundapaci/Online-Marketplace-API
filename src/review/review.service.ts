@@ -1,5 +1,4 @@
-// src/review/review.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto';
 
@@ -8,6 +7,21 @@ export class ReviewService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createReviewDto: CreateReviewDto) {
+    const { userId, productId } = createReviewDto;
+
+    const hasOrdered = await this.prisma.order.findFirst({
+      where: {
+        userId,
+        productId,
+      },
+    });
+
+    if (!hasOrdered) {
+      throw new BadRequestException(
+        'You can only review products you have purchased.',
+      );
+    }
+
     return this.prisma.review.create({
       data: createReviewDto,
     });
