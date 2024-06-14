@@ -15,7 +15,7 @@ import { CreateReviewDto, UpdateReviewDto } from './dto';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 //import { Roles } from 'src/auth/decorator';
 
-@Controller('reviews')
+@Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 

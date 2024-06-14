@@ -15,7 +15,7 @@ import { JwtGuard, RolesGuard } from 'src/auth/guard';
 //import { Roles } from 'src/auth/decorator';
 import { CreateOrderDto, UpdateOrderDto } from './dto';
 
-@Controller('orders')
+@Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
