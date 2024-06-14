@@ -1,6 +1,4 @@
-// src/order/dto/create-order.dto.ts
-import { IsNotEmpty, IsNumber, IsEnum } from 'class-validator';
-import { Status } from '@prisma/client';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateOrderDto {
   @IsNotEmpty()
@@ -14,11 +12,4 @@ export class CreateOrderDto {
   @IsNotEmpty()
   @IsNumber()
   quantity: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  totalPrice: number;
-
-  @IsEnum(Status)
-  status: Status;
 }

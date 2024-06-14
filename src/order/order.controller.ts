@@ -10,49 +10,71 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
+import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
-//import { Roles } from 'src/auth/decorator';
-import { CreateOrderDto, UpdateOrderDto } from './dto';
+import { GetUser } from 'src/auth/decorator';
+import { Status } from '@prisma/client';
+// import { Roles } from 'src/auth/decorator';
+// import { Role } from '@prisma/client';
 
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @UseGuards(JwtGuard)
+  @Get('history')
+  getOrderHistory(@GetUser('userId') userId: number) {
+    return this.orderService.findAllForUser(userId);
+  }
+
+  @UseGuards(JwtGuard)
   @Post()
-  @UseGuards(JwtGuard, RolesGuard)
-  //@Roles('BUYER')
   create(@Body() createOrderDto: CreateOrderDto) {
     return this.orderService.create(createOrderDto);
   }
 
-  @Get()
   @UseGuards(JwtGuard, RolesGuard)
-  //@Roles('ADMIN')
+  //@Roles(Role.ADMIN)
+  @Get()
   findAll() {
     return this.orderService.findAll();
   }
 
-  @Get(':id')
   @UseGuards(JwtGuard)
-  findOne(@Param('id', ParseIntPipe) orderId: number) {
-    return this.orderService.findOne(orderId);
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.findOne(id);
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
-  @UseGuards(JwtGuard, RolesGuard)
-  //@Roles('ADMIN', 'SELLER')
   update(
-    @Param('id', ParseIntPipe) orderId: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
-    return this.orderService.update(orderId, updateOrderDto);
+    return this.orderService.update(id, updateOrderDto);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
-  @UseGuards(JwtGuard, RolesGuard)
-  //@Roles('ADMIN')
-  remove(@Param('id', ParseIntPipe) orderId: number) {
-    return this.orderService.remove(orderId);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.remove(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get(':id/status')
+  getOrderStatus(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.getOrderStatus(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Patch(':id/status')
+  updateOrderStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status') status: Status,
+  ) {
+    return this.orderService.updateStatus(id, status);
   }
 }
