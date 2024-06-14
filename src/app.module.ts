@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from './mailer/mailer.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MailerModule } from './mailer/mailer.module';
     UserModule,
     PrismaModule,
     MailerModule,
+    SearchModule,
   ],
 })
 export class AppModule {}
