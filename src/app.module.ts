@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from './mailer/mailer.module';
 import { SearchModule } from './search/search.module';
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SearchModule } from './search/search.module';
     PrismaModule,
     MailerModule,
     SearchModule,
+    KafkaModule,
   ],
 })
 export class AppModule {}
