@@ -1,4 +1,3 @@
-// src/order/order.service.ts
 import {
   Injectable,
   NotFoundException,
@@ -8,16 +7,25 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Status } from '@prisma/client';
-import { MailerService } from 'src/mailer/mailer.service'; // Import the MailerService
+import { MailerService } from 'src/mailer/mailer.service';
+import { KafkaService } from 'src/kafka/kafka.service'; // Import the KafkaService
 
 @Injectable()
 export class OrderService {
   constructor(
     private prisma: PrismaService,
-    private mailerService: MailerService, // Inject the MailerService
+    private mailerService: MailerService,
+    private kafkaService: KafkaService, // Inject the KafkaService
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
+    // Send order to Kafka instead of processing immediately
+    await this.kafkaService.sendOrder(createOrderDto);
+    return { message: 'Order is being processed' };
+  }
+
+  // Process order inside the queue
+  async createOrderInQueue(createOrderDto: CreateOrderDto) {
     const { userId, productId, quantity } = createOrderDto;
 
     const product = await this.prisma.product.findUnique({
@@ -39,7 +47,7 @@ export class OrderService {
       data: { stock: product.stock - quantity },
     });
 
-    return this.prisma.order.create({
+    const order = await this.prisma.order.create({
       data: {
         userId,
         productId,
@@ -48,6 +56,17 @@ export class OrderService {
         status: Status.PENDING,
       },
     });
+
+    // Send confirmation email
+    const userEmail = (await this.prisma.user.findUnique({ where: { userId } }))
+      .email;
+    await this.mailerService.sendMail(
+      userEmail,
+      'Order Confirmation',
+      `Your order with ID ${order.orderId} has been placed successfully.`,
+    );
+
+    return order;
   }
 
   async findAll() {
@@ -119,7 +138,7 @@ export class OrderService {
   async updateStatus(orderId: number, status: Status) {
     const order = await this.prisma.order.findUnique({
       where: { orderId },
-      include: { owner: true }, // Include the owner information to get the email
+      include: { owner: true },
     });
 
     if (!order) {
