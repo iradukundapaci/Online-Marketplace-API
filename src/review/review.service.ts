@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto';
 
@@ -6,13 +6,14 @@ import { CreateReviewDto, UpdateReviewDto } from './dto';
 export class ReviewService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createReviewDto: CreateReviewDto) {
-    const { userId, productId } = createReviewDto;
+  async create(userId: number, createReviewDto: CreateReviewDto) {
+    const { productId, rating, comment } = createReviewDto;
 
     const hasOrdered = await this.prisma.order.findFirst({
       where: {
         userId,
         productId,
+        status: 'COMPLETED',
       },
     });
 
@@ -23,7 +24,12 @@ export class ReviewService {
     }
 
     return this.prisma.review.create({
-      data: createReviewDto,
+      data: {
+        userId,
+        productId,
+        rating,
+        comment,
+      },
     });
   }
 
@@ -38,9 +44,15 @@ export class ReviewService {
   }
 
   async update(reviewId: number, updateReviewDto: UpdateReviewDto) {
+    const { rating, comment } = updateReviewDto;
+
     return this.prisma.review.update({
       where: { reviewId },
-      data: updateReviewDto,
+      data: {
+        rating,
+        comment,
+        // userId and productId should not be updated as relationships in this example
+      },
     });
   }
 

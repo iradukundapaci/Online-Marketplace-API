@@ -1,10 +1,7 @@
+// src/review/dto/create-review.dto.ts
 import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
 
 export class CreateReviewDto {
-  @IsNotEmpty()
-  @IsNumber()
-  userId: number;
-
   @IsNotEmpty()
   @IsNumber()
   productId: number;

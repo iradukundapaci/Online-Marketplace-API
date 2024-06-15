@@ -24,7 +24,7 @@ export class ReviewController {
     @GetUser('userId') userId: number,
     @Body() createReviewDto: CreateReviewDto,
   ) {
-    return this.reviewService.create({ ...createReviewDto, userId });
+    return this.reviewService.create(userId, createReviewDto);
   }
 
   @Get()
