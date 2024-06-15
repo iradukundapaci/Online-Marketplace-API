@@ -8,10 +8,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Status } from '@prisma/client';
+import { MailerService } from 'src/mailer/mailer.service'; // Import the MailerService
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private mailerService: MailerService, // Inject the MailerService
+  ) {}
 
   async create(createOrderDto: CreateOrderDto) {
     const { userId, productId, quantity } = createOrderDto;
@@ -115,16 +119,27 @@ export class OrderService {
   async updateStatus(orderId: number, status: Status) {
     const order = await this.prisma.order.findUnique({
       where: { orderId },
+      include: { owner: true }, // Include the owner information to get the email
     });
 
     if (!order) {
       throw new NotFoundException('Order not found');
     }
 
-    return this.prisma.order.update({
+    const updatedOrder = await this.prisma.order.update({
       where: { orderId },
       data: { status },
     });
+
+    // Send email notification to the user
+    const userEmail = order.owner.email; // Assuming 'owner' has an 'email' field
+    await this.mailerService.sendMail(
+      userEmail,
+      'Order Status Update',
+      `Your order status has been updated to: ${status}`,
+    );
+
+    return updatedOrder;
   }
 
   async getOrderStatus(orderId: number) {
