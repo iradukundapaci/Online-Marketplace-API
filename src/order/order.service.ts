@@ -1,3 +1,4 @@
+// src/order/order.service.ts
 import {
   Injectable,
   NotFoundException,
@@ -6,28 +7,20 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { KafkaService } from 'src/kafka/kafka.service';
 import { Status } from '@prisma/client';
-import { MailerService } from 'src/mailer/mailer.service';
-import { KafkaService } from 'src/kafka/kafka.service'; // Import the KafkaService
 
 @Injectable()
 export class OrderService {
   constructor(
     private prisma: PrismaService,
-    private mailerService: MailerService,
-    private kafkaService: KafkaService, // Inject the KafkaService
+    private kafkaService: KafkaService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
-    // Send order to Kafka instead of processing immediately
-    await this.kafkaService.sendOrder(createOrderDto);
-    return { message: 'Order is being processed' };
-  }
+    const { productId, quantity } = createOrderDto;
 
-  // Process order inside the queue
-  async createOrderInQueue(createOrderDto: CreateOrderDto) {
-    const { userId, productId, quantity } = createOrderDto;
-
+    // Check if the product exists and if there's sufficient stock
     const product = await this.prisma.product.findUnique({
       where: { productId },
     });
@@ -39,52 +32,14 @@ export class OrderService {
       throw new BadRequestException('Insufficient stock');
     }
 
-    const totalPrice = product.price * quantity;
+    // Enqueue the order for processing
+    await this.kafkaService.sendOrder(createOrderDto);
 
-    // Update product stock
-    await this.prisma.product.update({
-      where: { productId },
-      data: { stock: product.stock - quantity },
-    });
-
-    const order = await this.prisma.order.create({
-      data: {
-        userId,
-        productId,
-        quantity,
-        totalPrice,
-        status: Status.PENDING,
-      },
-    });
-
-    // Send confirmation email
-    const userEmail = (await this.prisma.user.findUnique({ where: { userId } }))
-      .email;
-    await this.mailerService.sendMail(
-      userEmail,
-      'Order Confirmation',
-      `Your order with ID ${order.orderId} has been placed successfully.`,
-    );
-
-    return order;
+    // Return a confirmation to the user
+    return { message: 'Order received and is being processed' };
   }
 
-  async findAll() {
-    return this.prisma.order.findMany({
-      include: { product: true, owner: true },
-    });
-  }
-
-  async findOne(orderId: number) {
-    const order = await this.prisma.order.findUnique({
-      where: { orderId },
-      include: { product: true, owner: true },
-    });
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-    return order;
-  }
+  // Other methods for update, find, remove...
 
   async update(orderId: number, updateOrderDto: UpdateOrderDto) {
     const order = await this.findOne(orderId);
@@ -126,39 +81,32 @@ export class OrderService {
     });
   }
 
-  async findAllForUser(userId: number) {
-    return this.prisma.order.findMany({
-      where: { userId },
-      include: {
-        product: true,
-      },
-    });
-  }
-
-  async updateStatus(orderId: number, status: Status) {
+  async findOne(orderId: number) {
     const order = await this.prisma.order.findUnique({
       where: { orderId },
-      include: { owner: true },
+      include: { product: true, owner: true },
     });
-
     if (!order) {
       throw new NotFoundException('Order not found');
     }
+    return order;
+  }
 
-    const updatedOrder = await this.prisma.order.update({
-      where: { orderId },
-      data: { status },
+  async findAll() {
+    return this.prisma.order.findMany({
+      include: { product: true, owner: true },
+    });
+  }
+
+  async remove(orderId: number) {
+    const order = await this.findOne(orderId);
+
+    await this.prisma.product.update({
+      where: { productId: order.productId },
+      data: { stock: order.product.stock + order.quantity },
     });
 
-    // Send email notification to the user
-    const userEmail = order.owner.email; // Assuming 'owner' has an 'email' field
-    await this.mailerService.sendMail(
-      userEmail,
-      'Order Status Update',
-      `Your order status has been updated to: ${status}`,
-    );
-
-    return updatedOrder;
+    return this.prisma.order.delete({ where: { orderId } });
   }
 
   async getOrderStatus(orderId: number) {
@@ -174,14 +122,27 @@ export class OrderService {
     return order.status;
   }
 
-  async remove(orderId: number) {
-    const order = await this.findOne(orderId);
+  async findAllForUser(userId: number) {
+    return this.prisma.order.findMany({
+      where: { userId },
+      include: {
+        product: true,
+      },
+    });
+  }
 
-    await this.prisma.product.update({
-      where: { productId: order.productId },
-      data: { stock: order.product.stock + order.quantity },
+  async updateStatus(orderId: number, status: Status) {
+    const order = await this.prisma.order.findUnique({
+      where: { orderId },
     });
 
-    return this.prisma.order.delete({ where: { orderId } });
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return this.prisma.order.update({
+      where: { orderId },
+      data: { status },
+    });
   }
 }
