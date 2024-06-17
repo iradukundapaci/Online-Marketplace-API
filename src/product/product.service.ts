@@ -13,8 +13,24 @@ export class ProductService {
     });
   }
 
-  async findAll() {
-    return this.prisma.product.findMany();
+  async findAll(page: number, pageSize: number) {
+    const skip = (page - 1) * pageSize;
+    const take = pageSize;
+
+    const [products, totalCount] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        skip,
+        take,
+      }),
+      this.prisma.product.count(),
+    ]);
+
+    return {
+      data: products,
+      totalCount,
+      page,
+      pageSize,
+    };
   }
 
   async findOne(productId: number) {

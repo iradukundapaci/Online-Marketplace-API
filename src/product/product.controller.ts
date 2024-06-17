@@ -11,6 +11,7 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -25,6 +26,7 @@ import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { Roles, Seller } from 'src/auth/decorator';
 import { Role } from '@prisma/client';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('product')
 @ApiBearerAuth()
@@ -49,13 +51,14 @@ export class ProductController {
   @Get()
   @UseGuards(JwtGuard, RolesGuard)
   @Seller()
-  @ApiOperation({ summary: 'Get all products (seller only)' })
+  @ApiOperation({ summary: 'Get all products with pagination (seller only)' })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
-  findAll() {
-    return this.productService.findAll();
+  findAll(@Query() paginationDto: PaginationDto) {
+    const { page, pageSize } = paginationDto;
+    return this.productService.findAll(page, pageSize);
   }
 
   //Add get all product for seller
