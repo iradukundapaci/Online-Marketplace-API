@@ -18,22 +18,26 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ReviewService } from './review.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto';
-import { JwtGuard } from 'src/auth/guard';
-import { GetUser } from 'src/auth/decorator';
+import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { Admin, Buyer, GetUser } from 'src/auth/decorator';
 
 @ApiTags('review')
+@ApiBearerAuth()
 @Controller('review')
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
-  @UseGuards(JwtGuard)
-  @ApiOperation({ summary: 'Create a new review' })
+  @UseGuards(JwtGuard, RolesGuard)
+  @Buyer()
+  @ApiOperation({ summary: 'Create a new review (buyer only)' })
   @ApiResponse({ status: 201, description: 'Review created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiBody({ type: CreateReviewDto })
   @HttpCode(HttpStatus.CREATED)
   async create(
@@ -43,16 +47,21 @@ export class ReviewController {
     return this.reviewService.create(userId, createReviewDto);
   }
 
+  //edit to retrieve by product id
   @Get()
-  @ApiOperation({ summary: 'Get all reviews' })
+  @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Get all reviews (all users)' })
   @ApiResponse({ status: 200, description: 'Reviews retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Reviews not found' })
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.reviewService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a review by ID' })
+  @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
+  @ApiOperation({ summary: 'Get a review by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -61,14 +70,16 @@ export class ReviewController {
   })
   @ApiResponse({ status: 200, description: 'Review retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Review not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) reviewId: number) {
     return this.reviewService.findOne(reviewId);
   }
 
   @Patch(':id')
-  @UseGuards(JwtGuard)
-  @ApiOperation({ summary: 'Update a review by ID' })
+  @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
+  @ApiOperation({ summary: 'Update a review by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -77,6 +88,7 @@ export class ReviewController {
   })
   @ApiResponse({ status: 200, description: 'Review updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiBody({ type: UpdateReviewDto })
   @HttpCode(HttpStatus.OK)
   async update(
@@ -87,8 +99,9 @@ export class ReviewController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtGuard)
-  @ApiOperation({ summary: 'Delete a review by ID' })
+  @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
+  @ApiOperation({ summary: 'Delete a review by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -97,6 +110,7 @@ export class ReviewController {
   })
   @ApiResponse({ status: 204, description: 'Review deleted successfully' })
   @ApiResponse({ status: 404, description: 'Review not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) reviewId: number) {
     return this.reviewService.remove(reviewId);

@@ -17,6 +17,7 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
@@ -24,6 +25,7 @@ import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { Admin } from 'src/auth/decorator';
 
 @ApiTags('category')
+@ApiBearerAuth()
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
