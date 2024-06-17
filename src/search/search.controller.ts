@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -13,16 +14,20 @@ import {
   ApiResponse,
   ApiQuery,
   ApiParam,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { SearchService } from './search.service';
+import { JwtGuard } from 'src/auth/guard';
 
 @ApiTags('search')
+@ApiBearerAuth()
 @Controller('search')
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
   @Get('products')
-  @ApiOperation({ summary: 'Search for products' })
+  @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Search for products (All users)' })
   @ApiQuery({
     name: 'query',
     required: true,
@@ -36,7 +41,8 @@ export class SearchController {
   }
 
   @Get('category/:id')
-  @ApiOperation({ summary: 'Search products by category ID' })
+  @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Search products by category ID (All users)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -51,7 +57,8 @@ export class SearchController {
   }
 
   @Get('tag')
-  @ApiOperation({ summary: 'Search products by tag' })
+  @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Search products by tag (All users)' })
   @ApiQuery({ name: 'tag', required: true, description: 'Tag string' })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })

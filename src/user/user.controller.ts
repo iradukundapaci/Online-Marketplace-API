@@ -12,14 +12,21 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
-import { GetUser } from 'src/auth/decorator';
+import { Admin, GetUser } from 'src/auth/decorator';
 import { CreateUserDto } from './dto';
 
 @ApiTags('user')
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -27,7 +34,7 @@ export class UserController {
   // User: Get own information
   @UseGuards(JwtGuard)
   @Get('me')
-  @ApiOperation({ summary: 'Get own user information' })
+  @ApiOperation({ summary: 'Get own user information (all users)' })
   @ApiResponse({
     status: 200,
     description: 'User information retrieved successfully',
@@ -41,7 +48,7 @@ export class UserController {
   // User: Update own information
   @UseGuards(JwtGuard)
   @Patch('me')
-  @ApiOperation({ summary: 'Update own user information' })
+  @ApiOperation({ summary: 'Update own user information (all users)' })
   @ApiResponse({
     status: 200,
     description: 'User information updated successfully',
@@ -58,7 +65,7 @@ export class UserController {
   // User: Delete own account
   @UseGuards(JwtGuard)
   @Delete('me')
-  @ApiOperation({ summary: 'Delete own user account' })
+  @ApiOperation({ summary: 'Delete own user account (all users)' })
   @ApiResponse({
     status: 200,
     description: 'User account deleted successfully',
@@ -71,8 +78,9 @@ export class UserController {
 
   // Admin: Create a new user
   @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
+  @ApiOperation({ summary: 'Create a new user (admin only)' })
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -83,8 +91,9 @@ export class UserController {
 
   // Admin: Get all users
   @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
+  @ApiOperation({ summary: 'Get all users (admin only)' })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -95,8 +104,9 @@ export class UserController {
 
   // Admin: Get a user by ID
   @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
   @Get(':id')
-  @ApiOperation({ summary: 'Get a user by ID' })
+  @ApiOperation({ summary: 'Get a user by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -113,8 +123,9 @@ export class UserController {
 
   // Admin: Update a user by ID
   @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a user by ID' })
+  @ApiOperation({ summary: 'Update a user by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -134,8 +145,9 @@ export class UserController {
 
   // Admin: Delete a user by ID
   @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiOperation({ summary: 'Delete a user by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
