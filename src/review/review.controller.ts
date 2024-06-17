@@ -38,6 +38,7 @@ export class ReviewController {
   @ApiResponse({ status: 201, description: 'Review created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: CreateReviewDto })
   @HttpCode(HttpStatus.CREATED)
   async create(
@@ -53,6 +54,7 @@ export class ReviewController {
   @ApiOperation({ summary: 'Get all reviews (all users)' })
   @ApiResponse({ status: 200, description: 'Reviews retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Reviews not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.reviewService.findAll();
@@ -71,6 +73,7 @@ export class ReviewController {
   @ApiResponse({ status: 200, description: 'Review retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Review not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) reviewId: number) {
     return this.reviewService.findOne(reviewId);
@@ -89,6 +92,7 @@ export class ReviewController {
   @ApiResponse({ status: 200, description: 'Review updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: UpdateReviewDto })
   @HttpCode(HttpStatus.OK)
   async update(
@@ -111,6 +115,7 @@ export class ReviewController {
   @ApiResponse({ status: 204, description: 'Review deleted successfully' })
   @ApiResponse({ status: 404, description: 'Review not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) reviewId: number) {
     return this.reviewService.remove(reviewId);

@@ -35,6 +35,7 @@ export class SearchController {
   })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   searchProducts(@Query('query') query: string) {
     return this.searchService.searchProducts(query);
@@ -51,6 +52,7 @@ export class SearchController {
   })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   searchByCategory(@Param('id', ParseIntPipe) categoryId: number) {
     return this.searchService.searchByCategory(categoryId);
@@ -62,6 +64,7 @@ export class SearchController {
   @ApiQuery({ name: 'tag', required: true, description: 'Tag string' })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   searchByTag(@Query('tag') tag: string) {
     return this.searchService.searchByTag(tag);

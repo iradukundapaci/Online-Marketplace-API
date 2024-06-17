@@ -43,6 +43,7 @@ export class OrderController {
     description: 'Order history retrieved successfully',
   })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   getOrderHistory(@GetUser('userId') userId: number) {
     return this.orderService.findAllForUser(userId);
@@ -55,6 +56,7 @@ export class OrderController {
   @ApiResponse({ status: 201, description: 'Order created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: CreateOrderDto })
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createOrderDto: CreateOrderDto) {
@@ -67,6 +69,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Get all orders (admin only)' })
   @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.orderService.findAll();
@@ -85,6 +88,7 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.findOne(id);
@@ -103,6 +107,7 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Order updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: UpdateOrderDto })
   @HttpCode(HttpStatus.OK)
   update(
@@ -125,6 +130,7 @@ export class OrderController {
   @ApiResponse({ status: 204, description: 'Order deleted successfully' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.remove(id);
@@ -148,6 +154,7 @@ export class OrderController {
   })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   getOrderStatus(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.getOrderStatus(id);
@@ -172,6 +179,7 @@ export class OrderController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ enum: Status })
   @HttpCode(HttpStatus.OK)
   updateOrderStatus(

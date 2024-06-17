@@ -39,6 +39,7 @@ export class ProductController {
   @ApiResponse({ status: 201, description: 'Product created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: CreateProductDto })
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createProductDto: CreateProductDto) {
@@ -51,6 +52,7 @@ export class ProductController {
   @ApiOperation({ summary: 'Get all products (seller only)' })
   @ApiResponse({ status: 200, description: 'Products retrieved successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.productService.findAll();
@@ -69,6 +71,7 @@ export class ProductController {
   })
   @ApiResponse({ status: 200, description: 'Product retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Product not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) productId: number) {
     return this.productService.findOne(productId);
@@ -87,6 +90,7 @@ export class ProductController {
   @ApiResponse({ status: 200, description: 'Product updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: UpdateProductDto })
   @HttpCode(HttpStatus.OK)
   update(
@@ -109,6 +113,7 @@ export class ProductController {
   @ApiResponse({ status: 204, description: 'Product deleted successfully' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) productId: number) {
     return this.productService.remove(productId);

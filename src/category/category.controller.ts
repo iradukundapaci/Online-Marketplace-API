@@ -37,6 +37,7 @@ export class CategoryController {
   @ApiResponse({ status: 201, description: 'Category created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: CreateCategoryDto })
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createCategoryDto: CreateCategoryDto) {
@@ -50,6 +51,7 @@ export class CategoryController {
     status: 200,
     description: 'Categories retrieved successfully',
   })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.categoryService.findAll();
@@ -68,6 +70,7 @@ export class CategoryController {
   @ApiResponse({ status: 200, description: 'Category retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) categoryId: number) {
     return this.categoryService.findOne(categoryId);
@@ -86,6 +89,7 @@ export class CategoryController {
   @ApiResponse({ status: 200, description: 'Category updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBody({ type: UpdateCategoryDto })
   @HttpCode(HttpStatus.OK)
   update(
@@ -108,6 +112,7 @@ export class CategoryController {
   @ApiResponse({ status: 204, description: 'Category deleted successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) categoryId: number) {
     return this.categoryService.remove(categoryId);
