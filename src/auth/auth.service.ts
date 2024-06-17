@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { SigninDto, signupDto } from './dto';
+import { SigninDto, SignupDto } from './dto';
 import * as argon from 'argon2';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
@@ -16,7 +16,7 @@ class AuthService {
     private mailer: MailerService,
   ) {}
 
-  async signup(user: signupDto) {
+  async signup(user: SignupDto) {
     if (user == null) {
       return 'no user found';
     }
