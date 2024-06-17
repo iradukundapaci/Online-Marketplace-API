@@ -69,4 +69,12 @@ export class CreateProductDto {
   @IsOptional()
   @IsBoolean()
   isFeatured: boolean;
+
+  @ApiPropertyOptional({
+    example: 'https://example.com/image.png',
+    description: 'The URL of the product image',
+  })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
 }

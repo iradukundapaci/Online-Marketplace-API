@@ -68,6 +68,28 @@ services:
       KAFKAJS_NO_PARTITIONER_WARNING: 'true'
     depends_on:
       - zoo1
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports:
+      - 9000:9000
+    networks:
+      - Online-Marketplace
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data
+  minio-console:
+    image: minio/console
+    container_name: minio-console
+    ports:
+      - '9001:9001'
+    environment:
+      MINIO_SERVER: http://minio:9000
+      CONSOLE_ACCESS_KEY: minioadmin
+      CONSOLE_SECRET_KEY: minioadmin
+    depends_on:
+      - minio
 
 networks:
   Online-Marketplace:

@@ -10,6 +10,8 @@ import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from './mailer/mailer.module';
 import { SearchModule } from './search/search.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { MinioModule } from './minio/minio.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { KafkaModule } from './kafka/kafka.module';
     MailerModule,
     SearchModule,
     KafkaModule,
+    MinioModule,
+    PaymentModule,
   ],
 })
 export class AppModule {}

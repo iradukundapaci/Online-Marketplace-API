@@ -12,6 +12,8 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,6 +22,7 @@ import {
   ApiBody,
   ApiParam,
   ApiBearerAuth,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
@@ -27,12 +30,17 @@ import { CreateProductDto, UpdateProductDto } from './dto';
 import { Roles, Seller } from 'src/auth/decorator';
 import { Role } from '@prisma/client';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { MinioService } from 'src/minio/minio.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('product')
 @ApiBearerAuth()
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly minioService: MinioService,
+  ) {}
 
   @Post()
   @UseGuards(JwtGuard, RolesGuard)
@@ -42,9 +50,18 @@ export class ProductController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateProductDto })
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() createProductDto: CreateProductDto) {
+  async create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFile() image: Express.Multer.File,
+  ) {
+    if (image) {
+      const imageUrl = await this.minioService.uploadFile(image);
+      createProductDto.imageUrl = imageUrl;
+    }
     return this.productService.create(createProductDto);
   }
 
