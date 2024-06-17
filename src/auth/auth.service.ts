@@ -29,7 +29,12 @@ class AuthService {
         },
       });
 
-      const token = this.generateToken(data.userId, data.email, '30m');
+      const token = this.generateToken(
+        data.userId,
+        data.email,
+        data.role,
+        '30m',
+      );
       const verificationUrl = `http://localhost:3000/auth/verify?token=${token}`;
 
       await this.mailer.sendMail(
@@ -70,8 +75,9 @@ class AuthService {
       if (data.isVerified === false) {
         throw new ForbiddenException('Please verify your email');
       }
+      console.log(data.role);
 
-      return this.generateToken(data.userId, data.email);
+      return this.generateToken(data.userId, data.email, data.role);
     } catch (error) {
       throw error;
     }
