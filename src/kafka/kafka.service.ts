@@ -6,7 +6,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { Kafka, Producer, Consumer } from 'kafkajs';
+import { Kafka, Producer, Consumer, Admin } from 'kafkajs';
 import { ConfigService } from '@nestjs/config';
 import { CreateOrderDto } from 'src/order/dto/create-order.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,6 +17,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   private kafka: Kafka;
   private producer: Producer;
   private consumer: Consumer;
+  private admin: Admin;
 
   constructor(
     private configService: ConfigService,
@@ -24,16 +25,21 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   ) {
     this.kafka = new Kafka({
       clientId: 'nestjs-app',
-      brokers: [this.configService.get('KAFKA_BROKER')],
+      brokers: [this.configService.get<string>('KAFKA_BROKER')],
     });
 
     this.producer = this.kafka.producer();
     this.consumer = this.kafka.consumer({ groupId: 'nestjs-group' });
+    this.admin = this.kafka.admin();
   }
 
   async onModuleInit() {
     await this.producer.connect();
     await this.consumer.connect();
+    await this.admin.connect();
+
+    // Create the topic if it does not exist
+    await this.createTopic('process_order', 1, 1);
 
     await this.consumer.subscribe({
       topic: 'process_order',
@@ -42,8 +48,14 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
 
     this.consumer.run({
       eachMessage: async ({ message }) => {
-        const createOrderDto = JSON.parse(message.value.toString());
-        await this.processOrder(createOrderDto);
+        try {
+          const createOrderDto: CreateOrderDto = JSON.parse(
+            message.value.toString(),
+          );
+          await this.processOrder(createOrderDto);
+        } catch (error) {
+          console.error('Error processing message:', error);
+        }
       },
     });
   }
@@ -51,6 +63,26 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
   async onModuleDestroy() {
     await this.producer.disconnect();
     await this.consumer.disconnect();
+    await this.admin.disconnect();
+  }
+
+  async createTopic(
+    topic: string,
+    numPartitions: number,
+    replicationFactor: number,
+  ) {
+    const topics = await this.admin.listTopics();
+    if (!topics.includes(topic)) {
+      await this.admin.createTopics({
+        topics: [
+          {
+            topic,
+            numPartitions,
+            replicationFactor,
+          },
+        ],
+      });
+    }
   }
 
   async sendOrder(createOrderDto: CreateOrderDto) {
