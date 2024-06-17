@@ -21,7 +21,7 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
-// import { Roles } from 'src/auth/decorator';
+import { Admin } from 'src/auth/decorator';
 
 @ApiTags('category')
 @Controller('category')
@@ -30,10 +30,11 @@ export class CategoryController {
 
   @Post()
   @UseGuards(JwtGuard, RolesGuard)
-  // @Roles('ADMIN')
-  @ApiOperation({ summary: 'Create a new category' })
+  @Admin()
+  @ApiOperation({ summary: 'Create a new category (admin only)' })
   @ApiResponse({ status: 201, description: 'Category created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiBody({ type: CreateCategoryDto })
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createCategoryDto: CreateCategoryDto) {
@@ -41,7 +42,8 @@ export class CategoryController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all categories' })
+  @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Get all categories (all users)' })
   @ApiResponse({
     status: 200,
     description: 'Categories retrieved successfully',
@@ -52,7 +54,9 @@ export class CategoryController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a category by ID' })
+  @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
+  @ApiOperation({ summary: 'Get a category by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -61,6 +65,7 @@ export class CategoryController {
   })
   @ApiResponse({ status: 200, description: 'Category retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) categoryId: number) {
     return this.categoryService.findOne(categoryId);
@@ -68,8 +73,8 @@ export class CategoryController {
 
   @Patch(':id')
   @UseGuards(JwtGuard, RolesGuard)
-  // @Roles('ADMIN')
-  @ApiOperation({ summary: 'Update a category by ID' })
+  @Admin()
+  @ApiOperation({ summary: 'Update a category by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -78,6 +83,7 @@ export class CategoryController {
   })
   @ApiResponse({ status: 200, description: 'Category updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiBody({ type: UpdateCategoryDto })
   @HttpCode(HttpStatus.OK)
   update(
@@ -89,8 +95,8 @@ export class CategoryController {
 
   @Delete(':id')
   @UseGuards(JwtGuard, RolesGuard)
-  // @Roles('ADMIN')
-  @ApiOperation({ summary: 'Delete a category by ID' })
+  @Admin()
+  @ApiOperation({ summary: 'Delete a category by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -99,6 +105,7 @@ export class CategoryController {
   })
   @ApiResponse({ status: 204, description: 'Category deleted successfully' })
   @ApiResponse({ status: 404, description: 'Category not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) categoryId: number) {
     return this.categoryService.remove(categoryId);
