@@ -22,33 +22,37 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
-import { GetUser } from 'src/auth/decorator';
-import { Status } from '@prisma/client';
-// import { Roles } from 'src/auth/decorator';
-// import { Role } from '@prisma/client';
+import { Admin, Buyer, GetUser, Roles } from 'src/auth/decorator';
+import { Role, Status } from '@prisma/client';
 
 @ApiTags('order')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Buyer()
   @Get('history')
-  @ApiOperation({ summary: 'Get order history for the logged-in user' })
+  @ApiOperation({
+    summary: 'Get order history for the logged-in user (buyer only)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Order history retrieved successfully',
   })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
   getOrderHistory(@GetUser('userId') userId: number) {
     return this.orderService.findAllForUser(userId);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Buyer()
   @Post()
-  @ApiOperation({ summary: 'Create a new order' })
+  @ApiOperation({ summary: 'Create a new order (buyer only)' })
   @ApiResponse({ status: 201, description: 'Order created successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiBody({ type: CreateOrderDto })
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createOrderDto: CreateOrderDto) {
@@ -56,18 +60,20 @@ export class OrderController {
   }
 
   @UseGuards(JwtGuard, RolesGuard)
-  // @Roles(Role.ADMIN)
+  @Admin()
   @Get()
-  @ApiOperation({ summary: 'Get all orders' })
+  @ApiOperation({ summary: 'Get all orders (admin only)' })
   @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
   findAll() {
     return this.orderService.findAll();
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.BUYER)
   @Get(':id')
-  @ApiOperation({ summary: 'Get an order by ID' })
+  @ApiOperation({ summary: 'Get an order by ID (admin and buyer only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -76,14 +82,16 @@ export class OrderController {
   })
   @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
   @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.findOne(id);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
   @Patch(':id')
-  @ApiOperation({ summary: 'Update an order by ID' })
+  @ApiOperation({ summary: 'Update an order by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -92,6 +100,7 @@ export class OrderController {
   })
   @ApiResponse({ status: 200, description: 'Order updated successfully' })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiBody({ type: UpdateOrderDto })
   @HttpCode(HttpStatus.OK)
   update(
@@ -101,9 +110,10 @@ export class OrderController {
     return this.orderService.update(id, updateOrderDto);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Admin()
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete an order by ID' })
+  @ApiOperation({ summary: 'Delete an order by ID (admin only)' })
   @ApiParam({
     name: 'id',
     required: true,
@@ -112,14 +122,18 @@ export class OrderController {
   })
   @ApiResponse({ status: 204, description: 'Order deleted successfully' })
   @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.remove(id);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.BUYER)
   @Get(':id/status')
-  @ApiOperation({ summary: 'Get the status of an order by ID' })
+  @ApiOperation({
+    summary: 'Get the status of an order by ID (admin and buyer only)',
+  })
   @ApiParam({
     name: 'id',
     required: true,
@@ -131,14 +145,18 @@ export class OrderController {
     description: 'Order status retrieved successfully',
   })
   @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
   getOrderStatus(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.getOrderStatus(id);
   }
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.BUYER)
   @Patch(':id/status')
-  @ApiOperation({ summary: 'Update the status of an order by ID' })
+  @ApiOperation({
+    summary: 'Update the status of an order by ID (admin and buyer only)',
+  })
   @ApiParam({
     name: 'id',
     required: true,
@@ -150,6 +168,8 @@ export class OrderController {
     description: 'Order status updated successfully',
   })
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiBody({ enum: Status })
   @HttpCode(HttpStatus.OK)
   updateOrderStatus(
