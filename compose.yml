@@ -1,16 +1,11 @@
-version: '3.8'
 services:
-  nestjs-app:
-    build: .
+  server:
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
     ports:
-      - '3000:3000'
-    env_file:
-      - .env
-    depends_on:
-      - dev-db
-      - kafka1
-    networks:
-      - Online-Marketplace
+      - 3000:3000
 
   dev-db:
     image: postgres:13

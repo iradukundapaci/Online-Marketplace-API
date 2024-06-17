@@ -21,6 +21,9 @@ RUN npx prisma generate
 # Build the NestJS application
 RUN npm run build
 
+# Run the application as a non-root user.
+USER node
+
 # Expose the application port
 EXPOSE 3000
 
