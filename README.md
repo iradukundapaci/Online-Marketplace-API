@@ -75,6 +75,8 @@ To get a local copy up and running follow these simple steps.
 
 The database schema is designed to efficiently store and manage marketplace data. Here's a simplified representation:
 
+https://drive.google.com/file/d/16JgJChel3B1Om6WbKPbFusugyS8Rdy8y/view?usp=sharing
+
 ## Authentication and Authorization
 
 JWT (JSON Web Tokens) are used for authentication. User roles (buyer, seller, admin) determine access permissions to different endpoints.
@@ -96,7 +98,7 @@ Unit and integration tests are implemented using Jest. To run tests:
 For deployment, ensure Docker is installed on your server. Use Docker Compose to manage the application stack with multiple services.
 
 Docker commands
-  . Build Docker images:
+  . [x]Build Docker images:
   ```sh
     docker-compose up build
   ```
