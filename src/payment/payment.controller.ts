@@ -20,8 +20,7 @@ import {
 import { Role } from '@prisma/client';
 
 @Controller('payment')
-@ApiTags('user')
-@ApiBearerAuth()
+@ApiTags('payment')
 export class PaymentController {
   private readonly logger = new Logger(PaymentController.name);
 
@@ -30,6 +29,7 @@ export class PaymentController {
   @Post('initiate')
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(Role.BUYER)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Initiate order payment' })
   @ApiResponse({
     status: 200,
