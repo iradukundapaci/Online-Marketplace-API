@@ -1,73 +1,115 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Online Marketplace API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This project is a comprehensive RESTful API for an online marketplace, allowing users to buy and sell products, manage inventory, and process orders. It includes authentication, authorization, database integration, and various features required for a scalable and secure application.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Table of Contents
 
-## Description
+1. [Features](#features)
+2. [Technologies Used](#technologies-used)
+3. [Getting Started](#getting-started)
+4. [Database Schema](#database-schema)
+5. [Authentication and Authorization](#authentication-and-authorization)
+6. [API Documentation](#api-documentation)
+7. [Testing](#testing)
+8. [Deployment](#deployment)
+9. [System Design](#system-design)
+10. [Additional Features](#additional-features)
+11. [Future Improvements](#future-improvements)
+12. [Contributing](#contributing)
+13. [License](#license)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Features
 
-## Installation
+- **Users:**
+  - Register, login, manage profile.
+  - Email verification on registration.
 
-```bash
-$ npm install
-```
+- **Products:**
+  - Create, update, delete products for sale.
+  - Admins can mark products as featured.
 
-## Running the app
+- **Orders:**
+  - Place orders, track order status.
+  - Email notifications for order status updates.
+  - Queue system for asynchronous order processing.
 
-```bash
-# development
-$ npm run start
+- **Categories:**
+  - Categorize products for browsing.
 
-# watch mode
-$ npm run start:dev
+- **Reviews:**
+  - Allow users to review and rate products they have ordered.
 
-# production mode
-$ npm run start:prod
-```
+## Technologies Used
 
-## Test
+- **Backend Framework:** NestJS (Node.js with TypeScript)
+- **Database:** PostgreSQL
+- **Containerization:** Docker, Docker Compose
+- **Authentication:** JWT (JSON Web Tokens)
+- **Documentation:** Swagger OpenAPI 3
+- **Testing:** Jest (for unit and integration tests)
 
-```bash
-# unit tests
-$ npm run test
+## Getting Started
 
-# e2e tests
-$ npm run test:e2e
+To get a local copy up and running follow these simple steps.
 
-# test coverage
-$ npm run test:cov
-```
+### Prerequisites
 
-## Support
+- Docker installed on your machine.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Installation
 
-## Stay in touch
+1. Clone the repo
+   ```sh
+   git clone https://github.com/iradukundapaci/online-marketplace-api.git
+   ```
+2. Navigate to project directory
+    ```sh
+    cd online-marketplace-api
+    ```
+3. Build and run the docker containers
+    ```sh
+    docker-compose up --build
+    ```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Database Schema
 
-## License
+The database schema is designed to efficiently store and manage marketplace data. Here's a simplified representation:
 
-Nest is [MIT licensed](LICENSE).
+## Authentication and Authorization
+
+JWT (JSON Web Tokens) are used for authentication. User roles (buyer, seller, admin) determine access permissions to different endpoints.
+
+## API Documentation
+
+Swagger OpenAPI 3 documentation is available to browse and understand API endpoints. Access it at http://localhost:port/api-docs.
+
+## Testing 
+
+Unit and integration tests are implemented using Jest. To run tests:
+
+  ```sh
+    npm run test
+  ```
+
+## Deployment
+
+For deployment, ensure Docker is installed on your server. Use Docker Compose to manage the application stack with multiple services.
+
+Docker commands
+  . Build Docker images:
+  ```sh
+    docker-compose up build
+  ```
+  . Stop containers
+  ```sh
+    docker-compose down
+  ```
+
+## System Design
+
+The application follows a microservices architecture with separate services for API server, database (PostgreSQL), and potentially other services like email notifications (using SMTP). See System Design Diagram for details.
+
+## Additional Features
+
+. Imae upload funtionality for products
+. Payment processing funtionality with flutterwave
