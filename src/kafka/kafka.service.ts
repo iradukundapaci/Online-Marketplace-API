@@ -9,7 +9,7 @@ import {
 import { Kafka, Producer, Consumer, Admin } from 'kafkajs';
 import { ConfigService } from '@nestjs/config';
 import { CreateOrderDto } from 'src/order/dto/create-order.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { Status } from '@prisma/client';
 
 @Injectable()
