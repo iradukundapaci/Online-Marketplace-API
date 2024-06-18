@@ -135,5 +135,5 @@ The application follows a microservices architecture with separate services for 
 
 ## Additional Features
 
-. Imae upload funtionality for products
-. Payment processing funtionality with flutterwave
+1. Image upload funtionality for products
+2. Payment processing funtionality with flutterwave
