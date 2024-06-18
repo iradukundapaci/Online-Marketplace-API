@@ -22,8 +22,8 @@ import {
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderService } from './order.service';
-import { JwtGuard, RolesGuard } from 'src/auth/guard';
-import { Admin, Buyer, GetUser, Roles } from 'src/auth/decorator';
+import { JwtGuard, RolesGuard } from '../auth/guard';
+import { Admin, Buyer, GetUser, Roles } from '../auth/decorator';
 import { Role, Status } from '@prisma/client';
 
 @ApiTags('order')

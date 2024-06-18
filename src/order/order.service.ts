@@ -1,14 +1,13 @@
-// src/order/order.service.ts
 import {
   Injectable,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { KafkaService } from 'src/kafka/kafka.service';
 import { Status } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { KafkaService } from '../kafka/kafka.service';
 
 @Injectable()
 export class OrderService {
@@ -39,8 +38,6 @@ export class OrderService {
     return { message: 'Order received and is being processed' };
   }
 
-  // Other methods for update, find, remove...
-
   async update(orderId: number, updateOrderDto: UpdateOrderDto) {
     const order = await this.findOne(orderId);
 
@@ -55,7 +52,6 @@ export class OrderService {
         throw new NotFoundException('Product not found');
       }
 
-      const newTotalPrice = product.price * updateOrderDto.quantity;
       const stockDifference = updateOrderDto.quantity - order.quantity;
 
       if (product.stock < stockDifference) {
@@ -67,7 +63,7 @@ export class OrderService {
         data: { stock: product.stock - stockDifference },
       });
 
-      updateData.totalPrice = newTotalPrice;
+      updateData.totalPrice = product.price * updateOrderDto.quantity;
       updateData.quantity = updateOrderDto.quantity;
     }
 
@@ -100,6 +96,10 @@ export class OrderService {
 
   async remove(orderId: number) {
     const order = await this.findOne(orderId);
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
 
     await this.prisma.product.update({
       where: { productId: order.productId },
