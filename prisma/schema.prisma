@@ -60,7 +60,7 @@ model Product {
   price      Float
   stock   Int
   tag    String
-  imageUrl String
+  imageUrl String?
   isFeatured Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

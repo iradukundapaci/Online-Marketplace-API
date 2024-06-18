@@ -1,4 +1,3 @@
-// src/product/product.controller.ts
 import {
   Controller,
   Get,
@@ -26,7 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
-import { CreateProductDto, UpdateProductDto } from './dto';
+import { CreateProductDto, UpdateProductDto, UploadImageDto } from './dto';
 import { Roles, Seller } from 'src/auth/decorator';
 import { Role } from '@prisma/client';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -50,19 +49,30 @@ export class ProductController {
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() createProductDto: CreateProductDto) {
+    return this.productService.create(createProductDto);
+  }
+
+  @Post('upload-image')
+  @UseGuards(JwtGuard, RolesGuard)
+  @Seller()
+  @ApiOperation({ summary: 'Upload an image (seller only)' })
+  @ApiResponse({ status: 201, description: 'Image uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateProductDto })
+  @ApiBody({ type: UploadImageDto })
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Body() createProductDto: CreateProductDto,
+  async uploadImage(
     @UploadedFile() image: Express.Multer.File,
+    @Body('productId', ParseIntPipe) productId: number,
   ) {
-    if (image) {
-      const imageUrl = await this.minioService.uploadFile(image);
-      createProductDto.imageUrl = imageUrl;
-    }
-    return this.productService.create(createProductDto);
+    const imageUrl = await this.minioService.uploadFile(image);
+    await this.productService.updateImageUrl(productId, imageUrl);
+    return { imageUrl };
   }
 
   @Get()
@@ -77,8 +87,6 @@ export class ProductController {
     const { page, pageSize } = paginationDto;
     return this.productService.findAll(page, pageSize);
   }
-
-  //Add get all product for seller
 
   @Get(':id')
   @UseGuards(JwtGuard)

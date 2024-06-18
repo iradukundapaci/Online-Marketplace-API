@@ -39,6 +39,14 @@ export class ProductService {
     });
   }
 
+  async updateImageUrl(productId: number, imageUrl: string) {
+    productId = Number(productId);
+    return this.prisma.product.update({
+      where: { productId: productId },
+      data: { imageUrl },
+    });
+  }
+
   async update(productId: number, updateProductDto: UpdateProductDto) {
     return this.prisma.product.update({
       where: { productId },
