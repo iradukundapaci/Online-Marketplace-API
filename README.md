@@ -88,7 +88,11 @@ Swagger OpenAPI 3 documentation is available to browse and understand API endpoi
 ## Testing 
 
 Unit and integration tests are implemented using Jest. To run tests:
-
+  1. Create .env.test file:
+  ```sh
+      cp .env.example .env.test
+  ```
+  2. run test:
   ```sh
     npm run test
   ```
