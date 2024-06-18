@@ -1,11 +1,27 @@
+version: '3.8'
+
 services:
   server:
-    build:
-      context: .
+    image: paciradukunda/onlinemarketplaceapi:v1.1
     environment:
       NODE_ENV: production
+      DATABASE_URL: 'postgresql://admin:admin@localhost:5432/Online-Marketplace?schema=public'
+      EMAIL_USER: paifiquelinuxmail@gmail.com
+      EMAIL_PASSWORD: bjov czkg prwl ixeu
+      JWT_SECRET: 'super-secret'
+      KAFKA_BROKER: 127.0.0.1:9092
+      MINIO_ENDPOINT: localhost
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET_NAME: products
+      FLUTTERWAVE_SECRET_KEY: FLWSECK_TEST-92ccbb468e3d5409cb83a0385d9589ee-X
     ports:
       - 3000:3000
+    depends_on:
+      - dev-db
+      - kafka1
+      - minio
 
   dev-db:
     image: postgres:13
@@ -28,6 +44,9 @@ services:
       POSTGRES_DB: Online-Marketplace
     networks:
       - Online-Marketplace
+    profiles:
+      - test
+
   zoo1:
     image: confluentinc/cp-zookeeper:7.3.2
     hostname: zoo1
@@ -68,6 +87,7 @@ services:
       KAFKAJS_NO_PARTITIONER_WARNING: 'true'
     depends_on:
       - zoo1
+
   minio:
     image: minio/minio
     container_name: minio
