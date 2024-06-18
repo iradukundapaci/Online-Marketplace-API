@@ -68,7 +68,7 @@ To get a local copy up and running follow these simple steps.
     ```
 3. Build and run the docker containers
     ```sh
-    docker-compose up --build
+    docker-compose up
     ```
 
 ## Database Schema
@@ -102,11 +102,11 @@ Unit and integration tests are implemented using Jest. To run tests:
 For deployment, ensure Docker is installed on your server. Use Docker Compose to manage the application stack with multiple services.
 
 Docker commands
-  . [x]Build Docker images:
+  1. Build Docker images:
   ```sh
-    docker-compose up build
+    docker-compose up
   ```
-  . Stop containers
+  2. Stop containers
   ```sh
     docker-compose down
   ```
