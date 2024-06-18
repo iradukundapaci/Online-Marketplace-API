@@ -18,6 +18,9 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Generate Prisma client
+RUN npx prisma migrate deploy --preview-feature
+
 # Build the NestJS application
 RUN npm run build
 
