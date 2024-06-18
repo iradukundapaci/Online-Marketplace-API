@@ -21,19 +21,23 @@ This project is a comprehensive RESTful API for an online marketplace, allowing 
 ## Features
 
 - **Users:**
+
   - Register, login, manage profile.
   - Email verification on registration.
 
 - **Products:**
+
   - Create, update, delete products for sale.
   - Admins can mark products as featured.
 
 - **Orders:**
+
   - Place orders, track order status.
   - Email notifications for order status updates.
   - Queue system for asynchronous order processing.
 
 - **Categories:**
+
   - Categorize products for browsing.
 
 - **Reviews:**
@@ -63,13 +67,13 @@ To get a local copy up and running follow these simple steps.
    git clone https://github.com/iradukundapaci/online-marketplace-api.git
    ```
 2. Navigate to project directory
-    ```sh
-    cd online-marketplace-api
-    ```
+   ```sh
+   cd online-marketplace-api
+   ```
 3. Build and run the docker containers
-    ```sh
-    docker-compose up
-    ```
+   ```sh
+   docker-compose up
+   ```
 
 ## Database Schema
 
@@ -85,31 +89,45 @@ JWT (JSON Web Tokens) are used for authentication. User roles (buyer, seller, ad
 
 Swagger OpenAPI 3 documentation is available to browse and understand API endpoints. Access it at http://localhost:port/api-docs.
 
-## Testing 
+## Testing
 
 Unit and integration tests are implemented using Jest. To run tests:
-  1. Create .env.test file:
-  ```sh
-      cp .env.example .env.test
-  ```
-  2. run test:
-  ```sh
-    npm run test
-  ```
+
+1. Create .env.test file:
+
+```sh
+    cp .env.example .env.test
+```
+
+2. install packages:
+
+```sh
+  npm install
+```
+
+3. run test:
+
+```sh
+  npm run test
+```
 
 ## Deployment
 
 For deployment, ensure Docker is installed on your server. Use Docker Compose to manage the application stack with multiple services.
 
 Docker commands
-  1. Build Docker images:
-  ```sh
-    docker-compose up
-  ```
-  2. Stop containers
-  ```sh
-    docker-compose down
-  ```
+
+1. Build Docker images:
+
+```sh
+  docker-compose up
+```
+
+2. Stop containers
+
+```sh
+  docker-compose down
+```
 
 ## System Design
 
