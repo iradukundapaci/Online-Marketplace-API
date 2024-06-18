@@ -18,9 +18,6 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Generate Prisma client
-RUN npx prisma migrate deploy --preview-feature
-
 # Build the NestJS application
 RUN npm run build
 
@@ -31,4 +28,4 @@ USER node
 EXPOSE 3000
 
 # Start the application
-CMD ["npm", "run", "start:prod"]
+CMD npx prisma migrate deploy && npm run start:prod
