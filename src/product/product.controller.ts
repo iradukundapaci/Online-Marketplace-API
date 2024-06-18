@@ -24,12 +24,12 @@ import {
   ApiConsumes,
 } from '@nestjs/swagger';
 import { ProductService } from './product.service';
-import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { JwtGuard, RolesGuard } from '../auth/guard';
 import { CreateProductDto, UpdateProductDto, UploadImageDto } from './dto';
-import { Roles, Seller } from 'src/auth/decorator';
+import { Roles, Seller } from '../auth/decorator';
 import { Role } from '@prisma/client';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { MinioService } from 'src/minio/minio.service';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { MinioService } from '../minio/minio.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('product')
