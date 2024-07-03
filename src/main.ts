@@ -14,6 +14,7 @@ async function bootstrap() {
     .setTitle('Online Marketplace API')
     .setDescription('The Online Marketplace API description')
     .setVersion('1.0')
+    .addBearerAuth()
     .addTag('Online Marketplace')
     .build();
   const document = SwaggerModule.createDocument(app, config);
