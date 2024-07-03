@@ -9,6 +9,12 @@ WORKDIR /app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+# Copy wait-for-it.sh into the container
+COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+
+# Grant execute permissions to wait-for-it.sh
+RUN chmod +x /usr/local/bin/wait-for-it.sh
+
 # Install dependencies
 RUN npm install
 
@@ -20,9 +26,6 @@ RUN npx prisma generate
 
 # Build the NestJS application
 RUN npm run build
-
-# Run the application as a non-root user.
-USER node
 
 # Expose the application port
 EXPOSE 3000
