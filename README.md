@@ -120,7 +120,7 @@ Docker commands
 1. Build Docker images:
 
 ```sh
-  docker-compose up
+  docker-compose up --build
 ```
 
 2. Stop containers
