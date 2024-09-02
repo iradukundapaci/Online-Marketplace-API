@@ -87,7 +87,7 @@ JWT (JSON Web Tokens) are used for authentication. User roles (buyer, seller, ad
 
 ## API Documentation
 
-Swagger OpenAPI 3 documentation is available to browse and understand API endpoints. Access it at http://localhost:port/api-docs.
+Swagger OpenAPI 3 documentation is available to browse and understand API endpoints. Access it at http://localhost:port/api .
 
 ## Testing
 
